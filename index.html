@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Implementation Check Trace - 1761436396</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        body {
+            padding-top: 60px;
+        }
+        #loadingIndicator {
+            display: none;
+        }
+        #resultContainer {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Implementation Check</a>
+        </div>
+    </nav>
+    <div class="container my-4">
+        <h1 class="mb-4">Implementation Check: Task ID 1761436396</h1>
+        <p class="mb-3">This is a simple implementation check web application.</p>
+        <div class="mb-3">
+            <label for="urlInput" class="form-label">Enter URL parameter (optional):</label>
+            <input type="text" class="form-control" id="urlInput" placeholder="e.g., https://example.com" />
+        </div>
+        <button id="startBtn" class="btn btn-primary mb-3">Start Check</button>
+        <div id="loadingIndicator" class="d-flex align-items-center mb-3">
+            <div class="spinner-border text-primary me-2" role="status" aria-hidden="true"></div>
+            <span>Loading...</span>
+        </div>
+        <div id="userMessage" class="alert alert-info" style="display:none;"></div>
+        <div id="resultContainer" class="border p-3 rounded">
+            <h5>Results:</h5>
+            <ul class="list-group" id="resultList"></ul>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const startBtn = document.getElementById('startBtn');
+            const urlInput = document.getElementById('urlInput');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const userMessage = document.getElementById('userMessage');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultList = document.getElementById('resultList');
+
+            // Function to parse URL parameters
+            function getUrlParameter(name) {
+                const params = new URLSearchParams(window.location.search);
+                return params.get(name);
+            }
+
+            // Initialize URL input if parameter exists
+            const initialUrl = getUrlParameter('url');
+            if (initialUrl) {
+                urlInput.value = initialUrl;
+            }
+
+            // Utility functions
+            function showLoading(show) {
+                loadingIndicator.style.display = show ? 'flex' : 'none';
+            }
+
+            function showMessage(message, type='info') {
+                userMessage.className = `alert alert-${type}`;
+                userMessage.textContent = message;
+                userMessage.style.display = message ? 'block' : 'none';
+            }
+
+            function clearResults() {
+                resultList.innerHTML = '';
+                resultContainer.style.display = 'none';
+            }
+
+            function addResultItem(text, success=true) {
+                const li = document.createElement('li');
+                li.className = `list-group-item d-flex justify-content-between align-items-center ${success ? 'list-group-item-success' : 'list-group-item-danger'}`;
+                li.textContent = text;
+                resultList.appendChild(li);
+            }
+
+            // Main function to handle the check
+            async function handleCheck() {
+                const urlValue = urlInput.value.trim();
+                clearResults();
+                showMessage('');
+                if (!urlValue) {
+                    showMessage('Please enter a URL.', 'warning');
+                    return;
+                }
+
+                showLoading(true);
+                startBtn.disabled = true;
+
+                try {
+                    // Simulate a check: verify if URL is valid and reachable
+                    // For demo, perform a fetch request to the URL
+                    try {
+                        const response = await fetch(urlValue, { method: 'HEAD', mode: 'no-cors' });
+                        addResultItem(`URL is reachable: ${response.ok ? 'Yes' : 'No'}`);
+                    } catch (err) {
+                        addResultItem(`URL is reachable: No (Error)`);
+                    }
+
+                    // Additional check: validate URL format
+                    try {
+                        new URL(urlValue);
+                        addResultItem('URL format is valid.');
+                    } catch {
+                        addResultItem('URL format is invalid.', false);
+                    }
+
+                    // Indicate completion
+                    resultContainer.style.display = 'block';
+                } catch (error) {
+                    showMessage('An error occurred during the check.', 'danger');
+                } finally {
+                    showLoading(false);
+                    startBtn.disabled = false;
+                }
+            }
+
+            // Event listeners
+            startBtn.addEventListener('click', handleCheck);
+            // Optional: trigger check on Enter key in input
+            urlInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    handleCheck();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
